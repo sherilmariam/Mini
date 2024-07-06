@@ -1,27 +1,32 @@
-import React, { useState } from 'react'; // Import useState
-import './Home.css';
-import Header from '../../components/Header/Header';
-import Exploreorder from '../../components/Exploreorder/Exploreorder';
-import Fooddisplay from '../../components/fooddisplay/Fooddisplay';
-import Fooditem from '../../components/Fooditem/Fooditem';
-import Comparepopup from '../../components/Comparepopup/Comparepopup';
-import Restaurant from '../../components/Restaurant/Restaurant';
-import Aboutcontent from '../../components/Aboutcontent/Aboutcontent';
-const Home = () => {
-  const [category, setCategory] = useState("All");
-  const [showAbout,setShowAbout] =useState(false);
-  /*const [showCompare, setShowCompare] = useState(false)*/
+import React, { useEffect, useState } from 'react';
+import { getFoodItems } from '../../services/api';
 
-  return (
-    <div>
-       {showAbout?<Aboutcontent setShowAbout={setShowAbout} />:<></>}
-      <Header setShowAbout={setShowAbout} />
-      <Exploreorder category={category} setCategory={setCategory} />
-      <Fooddisplay category={category} /*setShowCompare={setShowCompare}*/  />
-      <Restaurant category={category} />
-    
-    </div>
-  );
+const Home = () => {
+    const [foodItems, setFoodItems] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await getFoodItems();
+                setFoodItems(data);
+            } catch (error) {
+                console.error('Error fetching food items:', error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    return (
+        <div>
+            <h1>Food Items</h1>
+            <ul>
+                {foodItems.map(item => (
+                    <li key={item.id}>{item.name} - ₹{item.price} - {item.delivery_time} mins</li>
+                ))}
+            </ul>
+        </div>
+    );
 };
 
 export default Home;
